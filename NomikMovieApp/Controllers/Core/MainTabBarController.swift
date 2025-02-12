@@ -12,6 +12,9 @@ class MainTabBarController: UITabBarController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        tabBar.backgroundColor = .mainColor
+        tabBar.tintColor = .systemOrange
+        
         let vc1 = HomeViewController()
         let vc2 = SearchViewController()
         let vc3 = WatchListViewController()
@@ -26,6 +29,8 @@ class MainTabBarController: UITabBarController {
         nav1.navigationBar.prefersLargeTitles = true
         nav2.navigationBar.prefersLargeTitles = true
         nav3.navigationBar.prefersLargeTitles = true
+        
+        nav1.navigationBar.backgroundColor = .mainColor
         
         nav1.tabBarItem.image = UIImage(systemName: "movieclapper")
         nav1.tabBarItem.title = "電影首頁"
