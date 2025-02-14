@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import SDWebImage
 
 class HomeHeaderCollectionViewCell: UICollectionViewCell {
     
@@ -27,11 +28,10 @@ class HomeHeaderCollectionViewCell: UICollectionViewCell {
     private let movieNumLabel: UILabel = {
         let label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
-        label.font = .systemFont(ofSize: 80)
+        label.font = .systemFont(ofSize: 70)
         label.textColor = .systemIndigo
         label.textAlignment = .center
         label.text = "2"
-        label.layer.borderWidth = 2
         return label
     }()
     
@@ -58,8 +58,9 @@ class HomeHeaderCollectionViewCell: UICollectionViewCell {
     }
     
     // MARK: - Functions
-    public func configureData(with image: String, num: Int) {
-        movieImageView.image = UIImage(named: image)
+    public func configureData(with imageUrl: String, num: Int) {
+        guard let url = URL(string: "https://image.tmdb.org/t/p/w185\(imageUrl)") else { return }
+        movieImageView.sd_setImage(with: url, placeholderImage: UIImage(systemName: "photo"))
         movieNumLabel.text = "\(num)"
     }
     
@@ -74,9 +75,9 @@ class HomeHeaderCollectionViewCell: UICollectionViewCell {
             movieImageView.widthAnchor.constraint(equalToConstant: 145),
             
             movieNumLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 3),
-            movieNumLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -20),
-            movieNumLabel.widthAnchor.constraint(equalToConstant: 50),
-            movieNumLabel.heightAnchor.constraint(equalToConstant: 70),
+            movieNumLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -10),
+            movieNumLabel.widthAnchor.constraint(equalToConstant: 80),
+            movieNumLabel.heightAnchor.constraint(equalToConstant: 80),
         ])
     }
     

@@ -7,11 +7,17 @@
 
 import UIKit
 
+protocol DetailTableViewCellDelegate: AnyObject {
+    func didSelectItem(_ item: String) // 定義點擊事件
+}
+
 class HomeTableViewCell: UITableViewCell {
 
     static let identifier = "HomeTableViewCell"
     
     // MARK: - Variables
+    private var movieLists: MovieListModel?
+    weak var delegate: DetailTableViewCellDelegate?
     
     // MARK: - UI Components
     private let movieListCollectionView: UICollectionView = {
@@ -44,6 +50,13 @@ class HomeTableViewCell: UITableViewCell {
     }
     
     // MARK: - Functions
+    public func configureData(to movieLists: MovieListModel) {
+        self.movieLists = movieLists
+        
+        DispatchQueue.main.async {
+            self.movieListCollectionView.reloadData()
+        }
+    }
     
     // MARK: - Selectors
     
@@ -61,12 +74,17 @@ class HomeTableViewCell: UITableViewCell {
 // MARK: - Extension
 extension HomeTableViewCell: UICollectionViewDelegate, UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return 20
+        return movieLists?.results.count ?? 10
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: HomeMovieListCollectionViewCell.identifier, for: indexPath) as? HomeMovieListCollectionViewCell else { return UICollectionViewCell() }
+        cell.configureData(with: movieLists?.results[indexPath.item].posterPath ?? "")
         return cell
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        delegate?.didSelectItem("ddd")
     }
 }
 

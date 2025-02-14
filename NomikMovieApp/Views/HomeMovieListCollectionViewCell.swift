@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import SDWebImage
 
 class HomeMovieListCollectionViewCell: UICollectionViewCell {
     
@@ -45,8 +46,9 @@ class HomeMovieListCollectionViewCell: UICollectionViewCell {
     }
     
     // MARK: - Functions
-    public func configureData(with image: String) {
-        movieListImageView.image = UIImage(named: image)
+    public func configureData(with imageUrl: String) {
+        guard let url = URL(string: "https://image.tmdb.org/t/p/w185\(imageUrl)") else { return }
+        movieListImageView.sd_setImage(with: url, placeholderImage: UIImage(systemName: "photo"))
     }
     
     // MARK: - Selectors

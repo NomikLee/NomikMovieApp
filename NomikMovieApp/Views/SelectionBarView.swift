@@ -6,10 +6,13 @@
 //
 
 import UIKit
+import Combine
 
 class SelectionBarView: UIView {
     
     // MARK: - Variables
+    var selectionBarTap = PassthroughSubject<String, Never>()
+    
     //didset偵測selectTap變化 i與selectTap比對 TitleColor與isActive 做三元運算 再賦值
     private var selectTap: Int = 0 {
         didSet {
@@ -90,17 +93,21 @@ class SelectionBarView: UIView {
         //按鈕按下後觸發selectTap和selectionPublisher
         switch text {
         case "Now Playing":
-            print("Now Playing")
-            selectTap = 0
+            selectionBarTap.send("Now Playing")
+            DispatchQueue.main.async {
+                self.selectTap = 0
+            }
         case "Upcoming":
-            print("Upcoming")
-            selectTap = 1
+            selectionBarTap.send("Upcoming")
+            DispatchQueue.main.async {
+                self.selectTap = 1
+            }
         case "Top Rated":
-            print("Top Rated")
             selectTap = 2
+            selectionBarTap.send("Top Rated")
         default:
-            print("Popular")
             selectTap = 3
+            selectionBarTap.send("Popular")
         }
     }
         

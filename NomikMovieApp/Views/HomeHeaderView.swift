@@ -6,10 +6,12 @@
 //
 
 import UIKit
+import Combine
 
 class HomeHeaderView: UIView {
 
     // MARK: - Variables
+    var viewModel: MovieTrendingModel?
     
     // MARK: - UI Components
     private let headerCollectionView: UICollectionView = {
@@ -43,6 +45,14 @@ class HomeHeaderView: UIView {
     }
     
     // MARK: - Functions
+    public func bindView(to viewModel: MovieTrendingModel) {
+        self.viewModel = viewModel
+    
+        DispatchQueue.main.async {
+            self.headerCollectionView.reloadData()
+        }
+    }
+    
     // MARK: - Selectors
     // MARK: - UI Setup
     
@@ -50,7 +60,7 @@ class HomeHeaderView: UIView {
 // MARK: - Extension
 extension HomeHeaderView: UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return 3
+        return 10
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
@@ -58,7 +68,7 @@ extension HomeHeaderView: UICollectionViewDelegate, UICollectionViewDataSource, 
         cell.layer.cornerRadius = 20
         cell.layer.masksToBounds = true
         
-        cell.configureData(with: "heroImage", num: (indexPath.row + 1))
+        cell.configureData(with: viewModel?.results[indexPath.item].poster_path ?? "", num: (indexPath.item + 1))
         return cell
     }
     

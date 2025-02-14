@@ -6,12 +6,18 @@
 //
 
 import UIKit
+import Combine
 
 class HomeViewController: UIViewController {
     
+    
     // MARK: - Variables
+    private let selectionBarView = SelectionBarView()
+    private let viewModel = HomeMovieListViewModel()
+    private lazy var homeHeaderView = HomeHeaderView(frame: CGRect(x: 0, y: 0, width: view.bounds.width, height: 300))
+    
     private var searchBar: UISearchController!
-    private let selectionBar = SelectionBarView()
+    private var cancellables: Set<AnyCancellable> = []
     
     // MARK: - UI Components
     private let homeTableView: UITableView = {
@@ -43,13 +49,15 @@ class HomeViewController: UIViewController {
         view.addSubview(homeTableView)
         titleView.addSubview(titleLabel)
         
-        homeTableView.tableHeaderView = HomeHeaderView(frame: CGRect(x: 0, y: 0, width: view.bounds.width, height: 300))
+        homeTableView.tableHeaderView = homeHeaderView
         homeTableView.delegate = self
         homeTableView.dataSource = self
+        
         
         navigationItem.titleView = titleView
         
         setSearch()
+//        bindView()
     }
     
     override func viewDidLayoutSubviews() {
@@ -58,6 +66,25 @@ class HomeViewController: UIViewController {
     }
     
     // MARK: - Functions
+    private func bindView() {
+        viewModel.fechMovieTrending()
+        viewModel.fechMoveLists(to: "Now Playing")
+        
+        viewModel.$movieTrendings.receive(on: DispatchQueue.main)
+            .sink { [weak self] datas in
+                if let viewModel = datas {
+                    self?.homeHeaderView.bindView(to: viewModel)
+                }
+            }
+            .store(in: &cancellables)
+        
+        viewModel.$movieLists.receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in
+                self?.homeTableView.reloadData()
+            }
+            .store(in: &cancellables)
+    }
+    
     private func setSearch() {
         searchBar = UISearchController(searchResultsController: nil)
         searchBar.searchResultsUpdater = self
@@ -90,6 +117,7 @@ class HomeViewController: UIViewController {
 }
 // MARK: - Extension
 extension HomeViewController: UITableViewDelegate, UITableViewDataSource {
+    
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return 1
     }
@@ -99,11 +127,21 @@ extension HomeViewController: UITableViewDelegate, UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
-        return selectionBar
+        selectionBarView.selectionBarTap.receive(on: DispatchQueue.main)
+            .sink { [weak self] name in
+                self?.viewModel.fechMoveLists(to: name)
+            }
+            .store(in: &cancellables)
+        
+        return selectionBarView
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         guard let cell = tableView.dequeueReusableCell(withIdentifier: HomeTableViewCell.identifier, for: indexPath) as? HomeTableViewCell else { return UITableViewCell() }
+        if let movieLists = viewModel.movieLists {
+            cell.configureData(to: movieLists)
+        }
+        cell.delegate = self
         return cell
     }
 }
@@ -112,5 +150,13 @@ extension HomeViewController: UISearchResultsUpdating {
     func updateSearchResults(for searchController: UISearchController) {
         guard let text = searchController.searchBar.text else { return }
         print(text)
+    }
+}
+
+extension HomeViewController: DetailTableViewCellDelegate {
+    func didSelectItem(_ item: String) {
+        let detail = DetailViewController()
+        detail.title = item
+        navigationController?.pushViewController(detail, animated: true)
     }
 }

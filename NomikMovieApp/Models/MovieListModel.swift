@@ -8,26 +8,20 @@
 import Foundation
 
 struct MovieListModel: Codable {
-    let dates: Dates
     let page: Int
     let results: [ResultsList]
 }
 
-struct Dates: Codable {
-    let maximum: String
-    let minimum: String
-}
-
 struct ResultsList: Codable {
     let adult: Bool
-    let backdropPath: String
+    let backdropPath: String?
     let genreIds: [Int]
     let id: Int
     let originalLanguage: String
     let originalTitle: String
     let overview: String
     let popularity: Double
-    let posterPath: String
+    let posterPath: String?
     let releaseDate: String
     let title: String
     let video: Bool
